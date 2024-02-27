@@ -9,6 +9,7 @@
 #define CHUNK_SIZE 1024
 
 char* read_from_file(char* filename);
+void write_to_file(char* filename, char* text_to_write);
 
 /** 
  * returns total file size in bytes.

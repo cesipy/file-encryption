@@ -89,3 +89,27 @@ int calculate_file_size(char* filename)
 
     return file_size;
 }
+
+
+void write_to_file(char* filename, char* text_to_write)
+{
+    FILE* dest_file;
+    int status;
+
+    dest_file = fopen(filename, "w");
+    if (dest_file == NULL) 
+    {
+        // todo: error handling
+        exit(EXIT_FAILURE);
+    }
+
+    status = fwrite(text_to_write, 1, strlen(text_to_write), dest_file);
+    if (status <1)
+    {
+        // todo: error handling
+        exit(EXIT_FAILURE);
+    }
+
+    fclose(dest_file);
+
+}
