@@ -3,13 +3,15 @@
 char* read_from_file(char* filename)
 {
     FILE* file;
-    char* buffer = NULL;
+    char* buffer = NULL;        // temporary buffer for each chunk.
     int file_size;
     int text_size_unsafe;
     int nread;
+    int total_read = 0;
     struct stat stbuf;
-
+    
     file_size = calculate_file_size(filename);
+    char* result_buffer = malloc(file_size + 1);    // +1 for \0;
 
     file = fopen(filename, "r");
     if (file == NULL) 
@@ -18,7 +20,6 @@ char* read_from_file(char* filename)
         exit(EXIT_FAILURE);
     }
 
-
     buffer = malloc(CHUNK_SIZE);
     if (buffer == NULL) 
     {
@@ -26,22 +27,40 @@ char* read_from_file(char* filename)
         exit(EXIT_FAILURE);
     }
 
-    while ((nread = fread(buffer, 1, CHUNK_SIZE, file)) > 0) 
+    // iterate over text
+    while (1) 
     {
-        fwrite(buffer, 1, nread, stdout);
-        if(ferror(file))
+        nread = fread(buffer, 1, CHUNK_SIZE, file);
+        
+        if (nread > 0) 
         {
-            fprintf(stderr, "error while reading file");
-            exit(EXIT_FAILURE);
+            memcpy(result_buffer + total_read, buffer, nread);       // copy to results
+            total_read += nread;
+            //fwrite(buffer, 1, nread, stdout);
+            if(ferror(file))
+            {
+                fprintf(stderr, "error while reading file");
+                exit(EXIT_FAILURE);
+            }
+        }
+        else
+        {
+            break;
         }
     }
+
+    // add termination symbol
+    result_buffer[file_size] = '\0';
 
     if (fclose(file) != 0) 
     {
         perror("Failed to close file");
         exit(EXIT_FAILURE);
     }
-    return buffer;      // do not return buffer, but 
+
+    free(buffer);
+
+    return result_buffer;
 }
 
 
