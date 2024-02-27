@@ -39,7 +39,6 @@ char* read_from_file(char* filename)
             memcpy(result_buffer + total_read, buffer, nread);       // copy to results
             total_read += nread;
             //logger("read until: %d", total_read);
-            //fwrite(buffer, 1, nread, stdout);
             if(ferror(file))
             {
                 fprintf(stderr, "error while reading file");
@@ -67,6 +66,7 @@ char* read_from_file(char* filename)
 }
 
 
+
 int calculate_file_size(char* filename)
 {
     int fd, file_size;
@@ -92,6 +92,7 @@ int calculate_file_size(char* filename)
 
     return file_size;
 }
+
 
 
 void write_to_file(char* filename, char* text_to_write)
