@@ -1,27 +1,43 @@
 #include "../include/encrypt.h"
 
-char* read_file(char* filename)
+char* read_from_file(char* filename)
 {
-    FILE* fd = fopen("filename", "w");
+    FILE* fd;
     char* buffer = NULL;
     int text_size;
     int text_size_unsafe;
     int nread;
     struct stat stbuf;
 
-    // get file size
-    fstat(fd, &stbuf);
-    text_size = stbuf.st_size;
+    fd = fopen(filename, "r");
+    if (fd == NULL) 
+    {
+        perror("Failed to open file");
+        exit(EXIT_FAILURE);
+    }
+
 
     buffer = malloc(CHUNK_SIZE);
-    // TODO: error handling
+    if (buffer == NULL) 
+    {
+        perror("Failed to allocate memory");
+        exit(EXIT_FAILURE);
+    }
 
     while ((nread = fread(buffer, 1, CHUNK_SIZE, fd)) > 0) 
     {
         fwrite(buffer, 1, nread, stdout);
-
+        if(ferror(fd))
+        {
+            fprintf(stderr, "error while reading file");
+            exit(EXIT_FAILURE);
+        }
     }
 
-    fclose(fd);
+    if (fclose(fd) != 0) 
+    {
+        perror("Failed to close file");
+        exit(EXIT_FAILURE);
+    }
     return buffer;
 }
