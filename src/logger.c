@@ -10,7 +10,7 @@ void init_logger(char* filename)
 {
     file = fopen(filename, "a");       // in append mode
     // todo: error handling
-    // dreturn file;
+    logger("Logger started");
 }
 
 
@@ -18,6 +18,7 @@ void tear_down_logger()
 {
     fclose(file);
     // todo: error handling
+    logger("Logger stopped");
     
 }
 
