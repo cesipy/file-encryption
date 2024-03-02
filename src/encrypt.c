@@ -271,8 +271,9 @@ unsigned long original_S[4][256] = {
 
 
 
-void init(blowfish_ctx_t* ctx_t, unsigned char* key, int len_key)
+void blowfish_init(blowfish_ctx_t* ctx_t, unsigned char* key, int len_key)
 {
+    logger("initiating blowfish");
     int S_i = 4;
     int S_j = 256;
     int P_i = 18;
@@ -327,13 +328,14 @@ void init(blowfish_ctx_t* ctx_t, unsigned char* key, int len_key)
         }
     }
 
+    logger("blowfish initiated");
 }
-
 
 
 
 unsigned long function_f(blowfish_ctx_t* ctx_t, unsigned long x) 
 {
+    
     // divide c into four eight-bit quartes
     unsigned short d = x & 0x00FF;      // bitwise AND with 00FF = 255 = 8 bits
     x = x >> 8;
@@ -348,6 +350,7 @@ unsigned long function_f(blowfish_ctx_t* ctx_t, unsigned long x)
     y = y + ctx_t->S[3][d];
 
     return y;
+
 }
 
 
@@ -374,6 +377,7 @@ void blowfish_encrypt(blowfish_ctx_t* ctx_t, unsigned long* x_l, unsigned long* 
 
     *x_r = *x_r ^ ctx_t->P[16];
     *x_l = *x_l ^ ctx_t->P[17];
+    logger("blowfish encrypted");
 }
 
 
