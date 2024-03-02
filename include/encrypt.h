@@ -27,6 +27,8 @@ typedef struct {
 
 
 unsigned long function_f(blowfish_ctx_t* ctx_t, unsigned long x); // same as in blowfish paper
-void blowfish_encrypt(blowfish_ctx_t* ctx_t, unsigned long* x);
-void blowfish_decrypt(blowfish_ctx_t* ctx_t, unsigned long* x);
+void blowfish_encrypt(blowfish_ctx_t* ctx_t, unsigned long* x_l, unsigned long* x_r);
+void blowfish_decrypt(blowfish_ctx_t* ctx_t, unsigned long* x_l, unsigned long* x_r);
+
+// currently not in use.
 void split_message(unsigned long* x_l, unsigned long* x_r, unsigned long* x);

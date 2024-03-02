@@ -290,7 +290,42 @@ void init(blowfish_ctx_t* ctx_t, unsigned char* key, int len_key)
         ctx_t->P[i] = original_P[i];
     }
 
-    unsigned long x = 0;        // = 0x00000000
+    unsigned long k;
+    int p = 0;
+    for (int i=0; i<P_i; i++)
+    {
+        k = 0;     // reset k to 0x00000000
+
+        for (int j=0; j<4; j++)
+        {
+            k = (k << 8) | key[p];
+            p = (p + 1) % len_key;
+        }
+        ctx_t->P[i] = ctx_t->P[i] ^ k;
+    }
+    // implementaion is strongly inspired by paper and wikipedia
+    // https://en.wikipedia.org/wiki/Blowfish_(cipher)
+
+    unsigned long x_l = 0x00000000;
+    unsigned long x_r = 0x00000000;
+
+    for (int i=0; i<P_i; i+=2)
+    {
+        blowfish_encrypt(ctx_t, &x_l, &x_r);
+        ctx_t->P[i] = x_l;
+        ctx_t->P[i+1] = x_r;
+    
+    }
+
+    for (int i=0; i<S_i; i++)
+    {
+        for (int j=0; j<S_j; j+=2)
+        {
+            blowfish_encrypt(ctx_t, &x_l, &x_r);
+            ctx_t->S[i][j] = x_l;
+            ctx_t->S[i][j+1] = x_r;
+        }
+    }
 
 }
 
@@ -318,63 +353,53 @@ unsigned long function_f(blowfish_ctx_t* ctx_t, unsigned long x)
 
 
 // todo: use pointer instead of real values
-void blowfish_encrypt(blowfish_ctx_t* ctx_t, unsigned long* x)
+void blowfish_encrypt(blowfish_ctx_t* ctx_t, unsigned long* x_l, unsigned long* x_r)
 {
-    // split into left and right
-    unsigned long x_l;
-    unsigned long x_r;
-    split_message(&x_l, &x_r, x);
-
     unsigned long temp;
 
     for (int i=0; i<16; i++)
     {
-        x_l = x_l ^ ctx_t->P[i];
-        x_r = function_f(ctx_t, x_l) ^ x_r;
+        *x_l = *x_l ^ ctx_t->P[i];
+        *x_r = function_f(ctx_t, *x_l) ^ *x_r;
         
 
-        temp = x_l;
-        x_l = x_r;
-        x_r = temp;
+        temp = *x_l;
+        *x_l = *x_r;
+        *x_r = temp;
     }
 
-    temp = x_l;
-    x_l = x_r;
-    x_r = temp;
+    temp = *x_l;
+    *x_l = *x_r;
+    *x_r = temp;
 
-    x_r = x_r ^ ctx_t->P[16];
-    x_l = x_l ^ ctx_t->P[17];
+    *x_r = *x_r ^ ctx_t->P[16];
+    *x_l = *x_l ^ ctx_t->P[17];
 }
 
 
-void blowfish_decrypt(blowfish_ctx_t* ctx_t, unsigned long* x)
+void blowfish_decrypt(blowfish_ctx_t* ctx_t, unsigned long* x_l, unsigned long* x_r)
 {
-    // split into left and right
-    unsigned long x_l;
-    unsigned long x_r;
-    split_message(&x_l, &x_r, x);
-
     unsigned long temp;
 
-    for (int i=16+1; i>1; i--)      // reverse order
+    for (int i=17; i>1; i--)      // reverse order
     {
-        x_l = x_l ^ ctx_t->P[i];
-        x_r = function_f(ctx_t, x_l) ^ x_r;
+        *x_l = *x_l ^ ctx_t->P[i];
+        *x_r = function_f(ctx_t, *x_l) ^ *x_r;
         
-        // swap
-        temp = x_l;
-        x_l = x_r;
-        x_r = temp;
+        temp = *x_l;
+        *x_l = *x_r;
+        *x_r = temp;
     }
 
-    // swap
-    temp = x_l;
-    x_l = x_r;
-    x_r = temp;
+    temp = *x_l;
+    *x_l = *x_r;
+    *x_r = temp;
 
-    x_r = x_r ^ ctx_t->P[1];
-    x_l = x_l ^ ctx_t->P[0];
+    *x_r = *x_r ^ ctx_t->P[1];
+    *x_l = *x_l ^ ctx_t->P[0];
 }
+
+
 
 
 void split_message(unsigned long* x_l, unsigned long* x_r, unsigned long* x)
