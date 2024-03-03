@@ -1,4 +1,5 @@
 #include "../include/encrypt.h"
+#include <openssl/aes.h>
 
 int main(int argc, char* argv[])
 {
@@ -7,30 +8,28 @@ int main(int argc, char* argv[])
 
     init_logger(LOG_FILE);
 
-    calculate_file_size(source_filename);
+    // Read the file into a buffer
     char* buf = read_from_file(source_filename);
 
-    write_to_file(dest_filename, buf);
-
-    free(buf);
-
-    logger("completely printed buf");
-
-    /*-------------------------------------------*/
-
     blowfish_ctx_t ctx;
-    unsigned long x_l = 10;
-    unsigned long x_r = 23;
     char* key = "completely random key";
     int key_len = 21;
+    
+    unsigned long x_l, x_r;
+    x_l = 123;
+    x_r = 456;
 
+    // Initialize the Blowfish context with the key
     blowfish_init(&ctx, (unsigned char*)key, key_len);
 
     blowfish_encrypt(&ctx, &x_l, &x_r);
-    logger("encrypted: %lu %lu", x_l, x_r);
+    logger("encrypted: l: %lu; r: %lu", x_l, x_r);
 
     blowfish_decrypt(&ctx, &x_l, &x_r);
-    logger("decrypted: %lu %lu", x_l, x_r);
+    logger("decrypted: l: %lu; r: %lu", x_l, x_r);
+
+
+    free(buf);
 
     tear_down_logger();
 

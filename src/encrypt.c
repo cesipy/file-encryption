@@ -273,7 +273,7 @@ unsigned long original_S[4][256] = {
 
 void blowfish_init(blowfish_ctx_t* ctx_t, unsigned char* key, int len_key)
 {
-    logger("initiating blowfish");
+    //logger("initiating blowfish");
     int S_i = 4;
     int S_j = 256;
     int P_i = 18;
@@ -328,7 +328,7 @@ void blowfish_init(blowfish_ctx_t* ctx_t, unsigned char* key, int len_key)
         }
     }
 
-    logger("blowfish initiated");
+    //logger("blowfish initiated");
 }
 
 
@@ -377,7 +377,7 @@ void blowfish_encrypt(blowfish_ctx_t* ctx_t, unsigned long* x_l, unsigned long* 
 
     *x_r = *x_r ^ ctx_t->P[16];
     *x_l = *x_l ^ ctx_t->P[17];
-    logger("blowfish encrypted");
+    // logger("blowfish encrypted");
 }
 
 
@@ -413,3 +413,21 @@ void split_message(unsigned long* x_l, unsigned long* x_r, unsigned long* x)
     *x_l = *x & 0xFFFFFFFF;
 }
 
+// encrypts only first sizeof(unsigned long) characters
+unsigned long chars_to_ulong(char* chars) 
+{
+    unsigned long result = 0;
+    for (int i = 0; i < sizeof(unsigned long) && chars[i] != '\0'; i++) {
+        result = (result << 8) | chars[i];
+    }
+    return result;
+}
+
+// encrypts only first sizeof(unsigned long) characters
+void ulong_to_chars(unsigned long value, char* chars) 
+{
+    for (int i = sizeof(unsigned long) - 1; i >= 0; i--) {
+        chars[i] = value & 0xFF;
+        value >>= 8;
+    }
+}

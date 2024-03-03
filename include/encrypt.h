@@ -33,3 +33,5 @@ void blowfish_init(blowfish_ctx_t* ctx_t, unsigned char* key, int len_key);
 
 // currently not in use.
 void split_message(unsigned long* x_l, unsigned long* x_r, unsigned long* x);
+unsigned long chars_to_ulong(char* chars);
+void ulong_to_chars(unsigned long value, char* chars);
