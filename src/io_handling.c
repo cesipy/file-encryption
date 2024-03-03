@@ -115,5 +115,72 @@ void write_to_file(char* filename, char* text_to_write)
     }
 
     fclose(dest_file);
+}
 
+
+char** process_chunks(char* text, int text_size, int chunk_size_bits)
+{
+    int num_chunks = calculate_num_chunks(text_size, chunk_size_bits);
+    
+    char ** chunks = split_text_into_chunks(text, text_size, chunk_size_bits, num_chunks);
+
+    // log chunks
+    for (int i = 0; i < num_chunks; i++)
+    {
+        logger("chunk %d: %s", i, chunks[i]);
+    }
+
+
+    return chunks;
+}
+
+
+
+char** split_text_into_chunks(char* text, int text_size, int chunk_size_bits, int num_chunks) 
+{
+    int chunk_size = chunk_size_bits / 8;
+
+    char** chunks = malloc(num_chunks * sizeof(char*)); // allocate memory for the chunks
+
+    printf("Text length: %d\n", text_size);
+    printf("Number of 64-bit chunks: %d\n", num_chunks);
+
+    for (int i = 0; i < num_chunks; i++)
+    {
+        char* buffer = malloc(chunk_size + 1); // allocate memory for each chunk
+        printf("chunk %d: ", i);
+        for (int j = 0; j < chunk_size; j++)
+        {
+            printf("%c", text[i * chunk_size + j]);
+            buffer[j] = text[i * chunk_size + j];
+        }
+        buffer[chunk_size] = '\0'; // add termination symbol
+        chunks[i] = buffer;
+        printf("\n");
+    }
+
+    return chunks;
+}
+
+int calculate_num_chunks(int text_size, int chunk_size_bit)
+{
+    int chunk_size = chunk_size_bit / 8;
+    int num_chunks = text_size / chunk_size;
+
+    // if text size is not a multiple of the chunk size, we need one more chunk
+    if (text_size % chunk_size != 0)
+    {
+        num_chunks++;
+    }
+
+    return num_chunks;
+}
+
+void free_chunks(char** chunks, int num_chunks)
+{
+    for (int i = 0; i < num_chunks; i++)
+    {
+        free(chunks[i]);
+    }
+    free(chunks);
 }

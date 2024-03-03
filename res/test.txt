@@ -1,1 +1,10 @@
 testament hallo
+Enumerating objects: 21, done.
+Counting objects: 100% (20/20), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (9/9), done.
+Writing objects: 100% (11/11), 1.69 KiB | 1.69 MiB/s, done.
+Total 11 (delta 3), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
+To https://github.com/cesipy/file-encryption
+   daf5e87..b493dd2  main -> main

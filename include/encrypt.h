@@ -1,3 +1,7 @@
+#ifndef ENCRYPT_H
+#define ENCRYPT_H
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -35,3 +39,12 @@ void blowfish_init(blowfish_ctx_t* ctx_t, unsigned char* key, int len_key);
 void split_message(unsigned long* x_l, unsigned long* x_r, unsigned long* x);
 unsigned long chars_to_ulong(char* chars);
 void ulong_to_chars(unsigned long value, char* chars);
+
+
+char** process_chunks(char* text, int text_size, int chunk_size_bits);
+char** split_text_into_chunks(char* text, int text_size, int chunk_size_bits, int num_chunks);
+int calculate_num_chunks(int text_size, int chunk_size_bit);
+void free_chunks(char** chunks, int num_chunks);
+
+
+#endif
