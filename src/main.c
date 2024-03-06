@@ -47,48 +47,46 @@ int main(int argc, char* argv[])
     logger("decrypted: l: %lu; r: %lu", x_l, x_r);
     
     char** chunks = process_chunks(buf, len, 64);
+
     int num_chunks = calculate_num_chunks(len, 64);
+    char** chunks_temp = malloc(num_chunks * sizeof(char*));
     unsigned long* chunks_unsigned_long = malloc(num_chunks * sizeof(unsigned long));
 
-    /*
-
-    for (int i=0; i<num_chunks; i++)
-    {
-        x_l = chars_to_ulong(chunks[i]);
-        x_r = chars_to_ulong(chunks[i]);
-        blowfish_encrypt(&ctx, &x_l, &x_r);
-        logger("encrypted chunk %d: %d", i, &x_l);
-
-    }
-
-    for (int i=0; i<num_chunks; i++)
-    {
-        blowfish_decrypt(&ctx, (unsigned long*)chunks[i], (unsigned long*)chunks[i]);
-        logger("decrypted chunk %d: %s", i, chunks[i]);
-    }
-    */
 
     convert_charChunks_to_longChunks(chunks, num_chunks, chunks_unsigned_long);
 
     for (int i=0; i<num_chunks; i++)
     {
-            logger("chunk %d: %lu", i, chunks_unsigned_long[i]);
+            logger("(unsigned) chunk %d: %lu", i, chunks_unsigned_long[i]);
     }
 
-    convert_longChunks_to_charChunks(chunks_unsigned_long, num_chunks, chunks);
 
     for (int i=0; i<num_chunks; i++)
     {
-        logger("chunk %d: %s", i, chunks[i]);
+        x_l = chunks_unsigned_long[i];
+        x_r = chunks_unsigned_long[i];
+        blowfish_encrypt(&ctx, &x_l, &x_r);
+        logger("encrypted chunk %d: %llu", i, &x_l);
     }
 
+    for (int i=0; i<num_chunks; i++) 
+    {
+        x_l = chunks_unsigned_long[i];
+        x_r = chunks_unsigned_long[i];
+        blowfish_decrypt(&ctx, &x_l, &x_r);
+        logger("decrypted chunk %d: %lu", i, &x_l);
+    }
+
+    convert_longChunks_to_charChunks(chunks_unsigned_long, num_chunks, chunks_temp);
+
+    for (int i=0; i<num_chunks; i++)
+    {
+        logger("(char from unsigned/after encryption) chunk %d: %s", i, chunks_temp[i]);
+    }
 
     free(chunks);
     free(buf);
-
     tear_down_logger();
 
     return EXIT_SUCCESS;
 }
-
-
